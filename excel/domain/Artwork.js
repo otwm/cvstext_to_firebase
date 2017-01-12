@@ -20,6 +20,7 @@ const Artwork = new Record({
     , city: []
     , locations: []
     , movies: []
+    , images: []
 });
 
 export default Artwork;

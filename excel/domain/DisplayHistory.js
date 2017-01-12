@@ -13,13 +13,15 @@ const DisplayHistory = new Record({
     , name: ''
     , nameEn: ''
     , type: ''
-    , premiere: false
     , source: ''
     , sourceEn: ''
+    , artworks: []
     , people: []
     , city: []
     , locations: []
+    , images: []
     , movies: []
+
 });
 
 export default DisplayHistory;

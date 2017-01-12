@@ -20,6 +20,7 @@ const Document = new Record({
     , city: []
     , locations: []
     , movies: []
+    , images: []
 });
 
 export default Document;

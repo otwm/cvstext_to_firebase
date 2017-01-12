@@ -11,7 +11,11 @@ const path = (domain) => {
     const domainPath = {
         People: "/people",
         City: "/city",
-        Age: "/Age",
+        Age: "/age",
+        Artwork: "/artwork",
+        DisplayHistory: "/displayHistory",
+        Analects: "/analects",
+        Document: "/document"
     };
     if (!domainPath[domain])throw '정의되지 않은 도메인';
     return domainPath[domain];
@@ -32,17 +36,18 @@ const saveToFirebase = (data, domain, resolve = () => {
         })(serverTime), error => error ? reject(error) : resolve());
     };
     partitioned[1].forEach(pushFunc);
-    ref.transaction(datas => {
-        if (partitioned[0].length)return datas;
-        return partitioned[0].filter(item => {
-            if (!datas[item.id]) {
-                console.error(`not exist item : ${item.id}`);
-            }
-            return datas[item.id];
-        }).map(item => {
-            return Object.assign({}, datas[item.id], item);
-        });
-    }).then(result => (console.log(result)));
+    if (partitioned[0].length) {
+        ref.transaction(datas => {
+            return partitioned[0].filter(item => {
+                if (!datas[item.id]) {
+                    console.error(`not exist item : ${item.id}`);
+                }
+                return datas[item.id];
+            }).map(item => {
+                return Object.assign({}, datas[item.id], item);
+            });
+        }).then(result => (console.log(result)));
+    }
 };
 
 export default saveToFirebase;

@@ -47,27 +47,27 @@ const readExcel = (filename, domainName, cb) => {
             readProcess(workbook, (sheet) => {
                 var resultRow = [];
                 sheet.eachRow({includeEmpty: true}, (row, rowNumber) => {
-                    // if (rowNumber !== 1) {
-                    var iter = new info[domainName]().keys();
-                    var record = {};
+                    if (rowNumber !== 1) {
+                        var iter = new info[domainName]().keys();
+                        var record = {};
 
-                    row.eachCell({includeEmpty: true}, cell => {
-                        const cellInfo = iter.next();
-                        const isValid = (done, key, value) => {
-                            if (done)return false;
-                            if (key !== "id")return true;
-                            if (value == 'null')return false;
-                            if (!value)return false;
-                            return true;
-                        };
-                        if (isValid(cellInfo.done, cellInfo.value, cell.value)) {
-                            record[cellInfo.value] = getValue(cell.value, cell.type);
-                        }
-                    });
+                        row.eachCell({includeEmpty: true}, cell => {
+                            const cellInfo = iter.next();
+                            const isValid = (done, key, value) => {
+                                if (done)return false;
+                                if (key !== "id")return true;
+                                if (value == 'null')return false;
+                                if (!value)return false;
+                                return true;
+                            };
+                            if (isValid(cellInfo.done, cellInfo.value, cell.value)) {
+                                record[cellInfo.value] = getValue(cell.value, cell.type);
+                            }
+                        });
 
-                    processRestColumn(iter, record);
-                    resultRow.push(record);
-                    // }
+                        processRestColumn(iter, record);
+                        resultRow.push(record);
+                    }
                 });
                 cb(resultRow);
             });
