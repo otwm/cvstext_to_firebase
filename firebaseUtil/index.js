@@ -9,7 +9,9 @@ const partition = (_data, _filter) => {
 
 const path = (domain) => {
     const domainPath = {
-        People: "/people"
+        People: "/people",
+        City: "/city",
+        Age: "/Age",
     };
     if (!domainPath[domain])throw '정의되지 않은 도메인';
     return domainPath[domain];

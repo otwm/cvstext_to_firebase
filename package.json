@@ -6,7 +6,7 @@
   "author": "otwm <otwmoo@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "server": "DEBUG=express:* babel-node --debug server.js"
+    "server": "DEBUG=express:* babel-node --debug=5858 server.js"
   },
   "dependencies": {
     "babel-core": "^6.21.0",

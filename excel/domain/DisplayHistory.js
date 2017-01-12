@@ -1,9 +1,8 @@
 import {Record} from "immutable";
 
-const Age = new Record({
+const DisplayHistory = new Record({
     id: ''
     , display: false
-    , main: false
     , age: ''
     , start_year: ''
     , start_month: ''
@@ -11,8 +10,10 @@ const Age = new Record({
     , end_year: ''
     , end_month: ''
     , end_day: ''
-    , content: ''
-    , contentEn: ''
+    , name: ''
+    , nameEn: ''
+    , type: ''
+    , premiere: false
     , source: ''
     , sourceEn: ''
     , people: []
@@ -21,4 +22,4 @@ const Age = new Record({
     , movies: []
 });
 
-export default Age;
+export default DisplayHistory;
