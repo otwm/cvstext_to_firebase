@@ -29,10 +29,14 @@ const scan = (_value) => {
     }
 };
 
-const getValue = (value) => {
+const getValue = (value, type) => {
     if (!value)return '';
-    if (value == Excel.ValueType.RichText) {
-        return value.richText.map(item => item.text).join('');
+    if (type == Excel.ValueType.RichText) {
+        console.log(value.richText);
+        return value.richText.map(item => {
+            console.log(item.text);
+            return item.text;
+        }).join('');
     }
     return value;
 };
@@ -43,6 +47,7 @@ const readExcel = (filename, domainName, cb) => {
             readProcess(workbook, (sheet) => {
                 var resultRow = [];
                 sheet.eachRow({includeEmpty: true}, (row, rowNumber) => {
+                    // if (rowNumber !== 1) {
                     var iter = new info[domainName]().keys();
                     var record = {};
 
@@ -56,12 +61,13 @@ const readExcel = (filename, domainName, cb) => {
                             return true;
                         };
                         if (isValid(cellInfo.done, cellInfo.value, cell.value)) {
-                            record[cellInfo.value] = getValue(cell.value);
+                            record[cellInfo.value] = getValue(cell.value, cell.type);
                         }
                     });
 
                     processRestColumn(iter, record);
                     resultRow.push(record);
+                    // }
                 });
                 cb(resultRow);
             });
