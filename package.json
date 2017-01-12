@@ -1,0 +1,23 @@
+{
+  "name": "cvstext_to_firebase",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/otwm/cvstext_to_firebase.git",
+  "author": "otwm <otwmoo@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "server": "DEBUG=express:* babel-node --debug server.js"
+  },
+  "dependencies": {
+    "babel-core": "^6.21.0",
+    "babel-loader": "^6.2.10",
+    "babel-preset-es2015": "^6.18.0",
+    "ejs": "^2.5.5",
+    "exceljs": "^0.2.39",
+    "express": "^4.14.0",
+    "firebase": "^3.6.5",
+    "immutable": "^3.8.1",
+    "multer": "^1.2.1",
+    "webpack": "^1.14.0"
+  }
+}
