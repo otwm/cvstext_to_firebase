@@ -19,5 +19,8 @@
     "immutable": "^3.8.1",
     "multer": "^1.2.1",
     "webpack": "^1.14.0"
+  },
+  "devDependencies": {
+    "babel-plugin-module-resolver": "^2.4.0"
   }
 }

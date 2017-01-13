@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import readExcel from "./excel";
 import saveToFirebase from './firebaseUtil';
+import changeAge from './dataRedefine/age';
 
 const app = express();
 const storage = multer.diskStorage({
@@ -21,6 +22,13 @@ app.use(express.static(__dirname + '/public'));
 
 app.get('/', (request, response) => {
     response.render('index');
+});
+
+app.get('/changeAge', (request, response) => {
+    changeAge();
+    response.status(200).end(JSON.stringify({
+        result: 'success'
+    }));
 });
 
 app.post('/upload', upload.single('excel'), (request, response) => {
