@@ -42,7 +42,6 @@ const change = () => {
     const ref = firebaseDatabase.ref('/age');
     ref.transaction(datas => {
         for (let key in datas) {
-            //TODO:
             datas[key] = convert(datas[key]);
             console.log(convert(datas[key]));
         }
