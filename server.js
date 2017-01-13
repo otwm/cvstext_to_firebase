@@ -3,6 +3,9 @@ import multer from "multer";
 import readExcel from "./excel";
 import saveToFirebase from './firebaseUtil';
 import changeAge from './dataRedefine/age';
+import changeArtwork from './dataRedefine/artwork';
+import changeDisplayHistory from './dataRedefine/displayHistory';
+import changeAnalects from './dataRedefine/analects';
 
 const app = express();
 const storage = multer.diskStorage({
@@ -30,6 +33,28 @@ app.get('/changeAge', (request, response) => {
         result: 'success'
     }));
 });
+
+app.get('/changeArtwork', (request, response) => {
+    changeArtwork();
+    response.status(200).end(JSON.stringify({
+        result: 'success'
+    }));
+});
+
+app.get('/changeDisplayHistory', (request, response) => {
+    changeDisplayHistory();
+    response.status(200).end(JSON.stringify({
+        result: 'success'
+    }));
+});
+
+app.get('/changeAnalects', (request, response) => {
+    changeAnalects();
+    response.status(200).end(JSON.stringify({
+        result: 'success'
+    }));
+});
+
 
 app.post('/upload', upload.single('excel'), (request, response) => {
     console.log(request.body.domain);
