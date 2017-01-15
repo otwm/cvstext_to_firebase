@@ -10,6 +10,7 @@ const loadDomainData = () => {
     cityRef.once('value')
         .then((snapshot) => domainData.city = snapshot.val());
 };
+
 loadDomainData();
 
 const findKey = (domainName, compare) => {
@@ -22,18 +23,22 @@ const findKey = (domainName, compare) => {
 };
 
 const convert = (item) => {
-    item.people = findKey(
-        'people',
-        (data) => data.name.trim() == item.people.trim()
-    );
-    let location = {};
-    location.address = item.locations;
-    location.city = findKey(
-        'city',
-        (data) => data.name.trim() == (item.city + '').trim()
-        || data.nameEn.trim() == (item.city + '').trim()
-    );
-    item.locations = {0: location};
+    if (item.people) {
+        item.people = findKey(
+            'people',
+            (data) => data.name.trim() == item.people.trim()
+        );
+    }
+    if (item.locations) {
+        let location = {};
+        location.address = item.locations;
+        location.city = findKey(
+            'city',
+            (data) => data.name.trim() == (item.city + '').trim()
+            || data.nameEn.trim() == (item.city + '').trim()
+        );
+        item.locations = {0: location};
+    }
     delete item.city;
     return item;
 };
@@ -42,7 +47,6 @@ const change = (ref) => {
     ref.transaction(datas => {
         for (let key in datas) {
             datas[key] = convert(datas[key]);
-            // console.log(convert(datas[key]));
         }
         return datas;
     }).then(result => (console.log(result)));

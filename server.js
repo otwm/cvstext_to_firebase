@@ -1,11 +1,18 @@
 import express from "express";
 import multer from "multer";
 import readExcel from "./excel";
-import saveToFirebase from './firebaseUtil';
-import changeAge from './dataRedefine/age';
-import changeArtwork from './dataRedefine/artwork';
-import changeDisplayHistory from './dataRedefine/displayHistory';
-import changeAnalects from './dataRedefine/analects';
+import saveToFirebase from "./firebaseUtil";
+import changeAge from "./dataRedefine/age";
+import changeArtwork from "./dataRedefine/artwork";
+import changeDisplayHistory from "./dataRedefine/displayHistory";
+import changeAnalects from "./dataRedefine/analects";
+import {
+    getContent,
+    startContentService,
+    createContents,
+    createContents4Interface,
+    removeContents4Interface
+} from "./service/interface";
 
 const app = express();
 const storage = multer.diskStorage({
@@ -55,6 +62,31 @@ app.get('/changeAnalects', (request, response) => {
     }));
 });
 
+app.get('/content', (request, response) => {
+    response.status(200).end(JSON.stringify(getContent()));
+});
+
+app.get('/createContents', (request, response) => {
+    createContents();
+    response.status(200).end(JSON.stringify({
+        result: 'success'
+    }));
+});
+
+app.get('/createContents4Interface', (request, response) => {
+    createContents4Interface();
+    response.status(200).end(JSON.stringify({
+        result: 'success'
+    }));
+});
+
+app.get('/removeContents4Interface', (request, response) => {
+    removeContents4Interface();
+    response.status(200).end(JSON.stringify({
+        result: 'success'
+    }));
+});
+
 
 app.post('/upload', upload.single('excel'), (request, response) => {
     console.log(request.body.domain);
@@ -76,5 +108,5 @@ app.get('*', (request, response) => {
 
 app.listen(4000, () => {
     console.log('Express app listening on port 4000');
-    // console.log(Excel);
+    startContentService();
 });
