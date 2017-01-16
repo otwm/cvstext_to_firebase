@@ -1,5 +1,6 @@
 import {firebaseDatabase} from "fb/firebase";
 import Immutable from "immutable";
+import {loadDomainData} from "/domain";
 
 const age = firebaseDatabase.ref('/age');
 const analects = firebaseDatabase.ref('/analects');
@@ -8,18 +9,7 @@ const displayHistory = firebaseDatabase.ref('/displayHistory');
 const content = firebaseDatabase.ref('/content');
 const contents4Interface = firebaseDatabase.ref('/contents4Interface');
 
-let domainData = {};
-
-const loadDomainData = () => {
-    const peopleRef = firebaseDatabase.ref('/people');
-    const cityRef = firebaseDatabase.ref('/city');
-    peopleRef.once('value')
-        .then((snapshot) => domainData.people = snapshot.val());
-    cityRef.once('value')
-        .then((snapshot) => domainData.city = snapshot.val());
-};
-
-loadDomainData();
+const domainData = loadDomainData();
 
 const findDomainByKey = (domainName, key) => {
     if (!domainData[domainName][key])return '';
@@ -34,6 +24,12 @@ export const startContentService = () => {
 };
 
 const convert = (item) => {
+    if (item.images) {
+        item.images = findDomainByKey(
+            'images', item.images
+        );
+    }
+
     if (item.people) {
         item.people = findDomainByKey(
             'people', item.people
@@ -53,11 +49,6 @@ const convert = (item) => {
     return item;
 };
 
-// if(is4Interface){
-//     contents4Interface.remove();
-// }else{
-//     content.remove();
-// }
 export const removeContents4Interface = () => {
     contents4Interface.remove().catch(e => console.error(e));
 }
@@ -70,6 +61,11 @@ const createLogic = (is4Interface) => {
         artwork.once('value').then((snapshot) => snapshot.val()),
         displayHistory.once('value').then((snapshot) => snapshot.val())
     ]).then(results => {
+        /**
+         * 프라미스 인자에 따른 타입 정의
+         * @param index
+         * @returns {*}
+         */
         const type = (index) => {
             switch (index) {
                 case 0:
@@ -83,7 +79,10 @@ const createLogic = (is4Interface) => {
             }
         };
 
-        const temp = results.map((item, index) => {
+        /**
+         * 컨텐츠 리스트 작성
+         */
+        const contents = results.map((item, index) => {
             let result = [];
             for (let key in item) {
                 result.push({
@@ -96,7 +95,7 @@ const createLogic = (is4Interface) => {
             return result;
         });
 
-        Immutable.fromJS(temp).flatten(true).sort((item1, item2) => {
+        Immutable.fromJS(contents).flatten(true).sort((item1, item2) => {
             const val = (map, prop, maxValue = 9999) => {
                 const value = map.getIn(['data', prop], maxValue) + '';
                 if (value === '')return maxValue;
@@ -134,9 +133,4 @@ export const createContents = () => {
 
 export const createContents4Interface = () => {
     createLogic(true);
-};
-
-
-export const getContent = () => {
-    //TODO: impl
 };

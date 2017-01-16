@@ -1,5 +1,5 @@
 import Excel from "exceljs";
-import info from "./domain";
+import info from "/domain";
 
 const readProcess = (workbook, cb) => {
     var isRead = false;
@@ -64,7 +64,6 @@ const readExcel = (filename, domainName, cb) => {
                                 record[cellInfo.value] = getValue(cell.value, cell.type);
                             }
                         });
-
                         processRestColumn(iter, record);
                         resultRow.push(record);
                     }

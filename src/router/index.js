@@ -3,9 +3,9 @@ import mainRoute from "./mainRoute";
 import excelRoute from "./excelRoute";
 
 const route = (app) => {
-    mainRoute(app);
     migrationRoute(app);
     excelRoute(app);
+    mainRoute(app);
 };
 
 export default route;

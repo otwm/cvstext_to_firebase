@@ -1,12 +1,12 @@
 import {Record} from "immutable";
 
-const Image = new Record({
+const Images = new Record({
     id: ''
     , caption: ''
     , captionEn: ''
     , source: ''
     , sourceEn: ''
-    , eachImage: []
+    , links: []
 });
 
-export default Image;
+export default Images;

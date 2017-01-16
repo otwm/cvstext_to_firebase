@@ -1,4 +1,6 @@
 import {firebaseDatabase, serverTime} from "./firebase";
+import {getDomainPath} from "/domain";
+import {fb} from "/core/util/basic";
 
 const partition = (_data, _filter) => {
     return _data.reduce(
@@ -7,31 +9,26 @@ const partition = (_data, _filter) => {
     );
 };
 
-const path = (domain) => {
-    const domainPath = {
-        People: "/people",
-        City: "/city",
-        Age: "/age",
-        Artwork: "/artwork",
-        DisplayHistory: "/displayHistory",
-        Analects: "/analects",
-        Document: "/document"
-    };
-    if (!domainPath[domain])throw '정의되지 않은 도메인';
-    return domainPath[domain];
-};
-
-const saveToFirebase = (data, domain, resolve = () => {
-    console.log('ok');
-}, reject = (error) => {
-    console.error(error)
+const saveToFirebase = (data, domain, {
+    resolve = () => {
+    },
+    reject = (error) => {
+        console.error(error)
+    }, propertiesCallBacks, hook
 }) => {
-    const ref = firebaseDatabase.ref(path(domain));
+    const ref = firebaseDatabase.ref(getDomainPath(domain));
     const partitioned = partition(data, _data => _data['id']);
     const pushFunc = data => {
         ref.push((function (serverTime) {
             console.log(`test ${data}`);
             data['createDate'] = serverTime;
+            if (propertiesCallBacks) {
+                for (let prop in propertiesCallBacks) {
+                    if (!fb.isNull(data[prop])) {
+                        data[prop] = propertiesCallBacks[prop](data);
+                    }
+                }
+            }
             return data;
         })(serverTime), error => error ? reject(error) : resolve());
     };
@@ -48,6 +45,7 @@ const saveToFirebase = (data, domain, resolve = () => {
             });
         }).then(result => (console.log(result)));
     }
+    if (hook) hook(data);
 };
 
 export default saveToFirebase;

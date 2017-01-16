@@ -18,6 +18,7 @@ const Age = new Record({
     , people: []
     , city: []
     , locations: []
+    , images: []
     , movies: []
 });
 

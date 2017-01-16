@@ -1,14 +1,21 @@
 import {firebaseDatabase} from "fb/firebase";
 
+import changeAnalects from "./analects";
+import changeArtwork from "./artwork";
+import changeDisplayHistory from "./displayHistory";
+
 let domainData = {};
 
 const loadDomainData = () => {
     const peopleRef = firebaseDatabase.ref('/people');
     const cityRef = firebaseDatabase.ref('/city');
+    const imagesRef = firebaseDatabase.ref('/images');
     peopleRef.once('value')
         .then((snapshot) => domainData.people = snapshot.val());
     cityRef.once('value')
         .then((snapshot) => domainData.city = snapshot.val());
+    imagesRef.once('value')
+        .then((snapshot) => domainData.images = snapshot.val());
 };
 
 loadDomainData();
@@ -23,12 +30,20 @@ const findKey = (domainName, compare) => {
 };
 
 const convert = (item) => {
+    if (item.images) {
+        item.images = findKey(
+            'images',
+            (data) => data.caption.trim() == item.images.trim()
+        );
+    }
+
     if (item.people) {
         item.people = findKey(
             'people',
             (data) => data.name.trim() == item.people.trim()
         );
     }
+
     if (item.locations) {
         let location = {};
         location.address = item.locations;
@@ -52,5 +67,15 @@ const change = (ref) => {
     }).then(result => (console.log(result)));
 };
 
+//이상하게 export 가 안되네??
+export const changeAge = () => {
+    change(firebaseDatabase.ref('/age'));
+};
+
+export {changeAnalects};
+export {changeArtwork};
+export {changeDisplayHistory};
 
 export default change;
+
+

@@ -5,7 +5,6 @@ import changeAnalects from "/dataRedefine/analects";
 import {createContents, createContents4Interface, removeContents4Interface} from "/service/interface";
 
 const migrationRoute = (app) => {
-
     app.get('/changeAge', (request, response) => {
         changeAge();
         response.status(200).end(JSON.stringify({
