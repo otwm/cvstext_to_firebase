@@ -13,8 +13,13 @@ import {
     createContents4Interface,
     removeContents4Interface
 } from "./service/interface";
+import {Server} from "websocket";
+import http from "http";
 
 const app = express();
+const server = http.createServer(app);
+// const wsServer = new WebSocketServer({server: server, path: "/contentNotice"});
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'upload/');
@@ -105,6 +110,10 @@ app.post('/upload', upload.single('excel'), (request, response) => {
 app.get('*', (request, response) => {
 
 });
+
+// wsServer.on('request', (request) => {
+//
+// });
 
 app.listen(4000, () => {
     console.log('Express app listening on port 4000');

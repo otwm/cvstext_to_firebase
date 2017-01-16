@@ -107,8 +107,7 @@ const createLogic = (is4Interface) => {
         // });
 
         Immutable.fromJS(temp).flatten(true).sort((item1, item2) => {
-            const val = (map, prop) => {
-                const maxValue = 9999;
+            const val = (map, prop, maxValue = 9999) => {
                 const value = map.getIn(['data', prop], maxValue) + '';
                 if (value === '')return maxValue;
                 return parseInt(value, 10);
@@ -121,6 +120,9 @@ const createLogic = (is4Interface) => {
             if (val(item1, 'start_month') < val(item2, 'start_month')) return -1;
             if (val(item1, 'start_day') > val(item2, 'start_day')) return 1;
             if (val(item1, 'start_day') < val(item2, 'start_day')) return 1;
+            if (val(item1, 'name', "+") > val(item2, 'name', "+")) return 1;
+            if (val(item1, 'name', "+") < val(item2, 'name', "+")) return -1;
+
             return 0;
         }).map(item => item.toJSON()).forEach((item, index) => {
             item.order = index;
