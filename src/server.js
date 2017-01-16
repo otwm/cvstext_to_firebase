@@ -15,11 +15,13 @@ import {
 } from "./service/interface";
 import http from "http";
 import socket from "socket.io";
-
-const app = express();
+import route from './router';
+export const app = express();
 const server = http.createServer(app);
 const io = socket(server);
 const contents4Interface = io.of('/contents4Interface');
+
+route(app);
 
 io.on('connection', (socket) => {
 
@@ -48,85 +50,7 @@ app.set('views', './src/views');
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
 
-app.get('/', (request, response) => {
-    response.render('index');
-});
 
-app.get('/changeAge', (request, response) => {
-    changeAge();
-    response.status(200).end(JSON.stringify({
-        result: 'success'
-    }));
-});
-
-app.get('/changeArtwork', (request, response) => {
-    changeArtwork();
-    response.status(200).end(JSON.stringify({
-        result: 'success'
-    }));
-});
-
-app.get('/changeDisplayHistory', (request, response) => {
-    changeDisplayHistory();
-    response.status(200).end(JSON.stringify({
-        result: 'success'
-    }));
-});
-
-app.get('/changeAnalects', (request, response) => {
-    changeAnalects();
-    response.status(200).end(JSON.stringify({
-        result: 'success'
-    }));
-});
-
-app.get('/content', (request, response) => {
-    response.status(200).end(JSON.stringify(getContent()));
-});
-
-app.get('/createContents', (request, response) => {
-    createContents();
-    response.status(200).end(JSON.stringify({
-        result: 'success'
-    }));
-});
-
-app.get('/createContents4Interface', (request, response) => {
-    createContents4Interface();
-    response.status(200).end(JSON.stringify({
-        result: 'success'
-    }));
-});
-
-app.get('/removeContents4Interface', (request, response) => {
-    removeContents4Interface();
-    response.status(200).end(JSON.stringify({
-        result: 'success'
-    }));
-});
-
-app.get('/test', (request, response) => {
-    response.render('test');
-});
-
-
-app.post('/upload', upload.single('excel'), (request, response) => {
-    console.log(request.body.domain);
-    readExcel(
-        request.file.path,
-        request.body.domain,
-        (datas) => {
-            saveToFirebase(datas, request.body.domain);
-        }
-    );
-    response.status(200).end(JSON.stringify({
-        result: 'success'
-    }));
-});
-
-app.get('*', (request, response) => {
-
-});
 
 server.listen(4000, () => {
     console.log('Express app listening on port 4000');
