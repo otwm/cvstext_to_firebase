@@ -13,12 +13,25 @@ import {
     createContents4Interface,
     removeContents4Interface
 } from "./service/interface";
-import {Server} from "websocket";
 import http from "http";
+import socket from "socket.io";
 
 const app = express();
 const server = http.createServer(app);
-// const wsServer = new WebSocketServer({server: server, path: "/contentNotice"});
+const io = socket(server);
+const contents4Interface = io.of('/contents4Interface');
+
+io.on('connection', (socket) => {
+
+});
+
+contents4Interface.on('connection', (socket) => {
+    console.log('connection interface!!!!');
+    socket.on('disconnect', function(){
+        console.log('interface disconnected');
+    });
+});
+
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -92,6 +105,10 @@ app.get('/removeContents4Interface', (request, response) => {
     }));
 });
 
+app.get('/test', (request, response) => {
+    response.render('test');
+});
+
 
 app.post('/upload', upload.single('excel'), (request, response) => {
     console.log(request.body.domain);
@@ -111,11 +128,10 @@ app.get('*', (request, response) => {
 
 });
 
-// wsServer.on('request', (request) => {
-//
-// });
-
-app.listen(4000, () => {
+server.listen(4000, () => {
     console.log('Express app listening on port 4000');
     startContentService();
 });
+
+
+// "https://firebasestorage.googleapis.com/v0/b/paik-5637b.appspot.com/o/images%2Fabc.jpg?alt=media&token=c6ff654a-be94-4a9d-825b-4f41941c3b9c"

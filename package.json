@@ -19,10 +19,11 @@
     "firebase-admin": "^4.0.4",
     "immutable": "^3.8.1",
     "multer": "^1.2.1",
-    "webpack": "^1.14.0",
-    "websocket": "^1.0.24"
+    "socket.io": "^1.7.2",
+    "webpack": "^1.14.0"
   },
   "devDependencies": {
-    "babel-plugin-module-resolver": "^2.4.0"
+    "babel-plugin-module-resolver": "^2.4.0",
+    "babel-preset-stage-0": "^6.16.0"
   }
 }

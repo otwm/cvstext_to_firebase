@@ -1,13 +1,19 @@
 {
   "presets": [
-    "es2015"
+    "es2015",
+    "stage-0"
   ],
   "plugins": [
-    ["module-resolver", {
-      "root": ["./"],
-      "alias": {
-        "fb": "./firebaseUtil"
+    [
+      "module-resolver",
+      {
+        "root": [
+          "./"
+        ],
+        "alias": {
+          "fb": "./firebaseUtil"
+        }
       }
-    }]
+    ]
   ]
 }
