@@ -96,16 +96,6 @@ const createLogic = (is4Interface) => {
             return result;
         });
 
-        // Immutable.fromJS(temp).flatten(true).sort((item1, item2) => {
-        //     if (item1.get('age', '999999') > item2.get('age', '999999')) return 1;
-        //     if (item1.get('start_year', '999999') > item2.get('start_year', '999999')) return 1;
-        //     if (item1.get('start_month', '999999') > item2.get('start_month', '999999')) return 1;
-        //     if (item1.get('start_day', '999999') > item2.get('start_day', '999999')) return 1;
-        //     return 0;
-        // }).forEach((a, b, c) => {
-        //     console.log(a);
-        // });
-
         Immutable.fromJS(temp).flatten(true).sort((item1, item2) => {
             const val = (map, prop, maxValue = 9999) => {
                 const value = map.getIn(['data', prop], maxValue) + '';
