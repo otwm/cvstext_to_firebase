@@ -8,10 +8,10 @@
       "module-resolver",
       {
         "root": [
-          "./"
+          "./src"
         ],
         "alias": {
-          "fb": "./firebaseUtil"
+          "fb": "./src/firebaseUtil"
         }
       }
     ]
