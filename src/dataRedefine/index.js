@@ -1,5 +1,4 @@
 import {firebaseDatabase} from "fb/firebase";
-
 import changeAnalects from "./analects";
 import changeArtwork from "./artwork";
 import changeDisplayHistory from "./displayHistory";
@@ -33,26 +32,43 @@ const convert = (item) => {
     if (item.images) {
         item.images = findKey(
             'images',
-            (data) => data.caption.trim() == item.images.trim()
+            (data) => {
+                if (!data.caption)return null;
+                if (!item.images)return null;
+                return data.caption.trim() == item.images.trim();
+            }
         );
     }
 
     if (item.people) {
         item.people = findKey(
             'people',
-            (data) => data.name.trim() == item.people.trim()
+            (data) => {
+                if (!(data.name || data.nameEn))return null;
+                if (!item.people)return null;
+                return (data.name + '').trim() == (item.people + '').trim()
+                    || (data.nameEn + '').trim() == (item.people + '').trim()
+            }
         );
     }
 
-    if (item.locations) {
+    if (item.locations || item.city) {
         let location = {};
-        location.address = item.locations;
+        location.address = item.locations || null;
         location.city = findKey(
             'city',
-            (data) => data.name.trim() == (item.city + '').trim()
-            || data.nameEn.trim() == (item.city + '').trim()
-        );
-        item.locations = {0: location};
+            (data) => {
+                if (!(data.name || data.nameEn))return null;
+                if (!item.city)return null;
+                return (data.name.trim() + '') == (item.city + '').trim()
+                    || (data.nameEn.trim() + '') == (item.city + '').trim();
+            }
+        ) || null;
+        if(!(location.city || location.address)){
+            item.locations = null;
+        } else{
+            item.locations = {0: location};
+        }
     }
     delete item.city;
     return item;

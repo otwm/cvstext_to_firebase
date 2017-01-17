@@ -2,7 +2,7 @@ import changeAge from "/dataRedefine/age";
 import changeArtwork from "/dataRedefine/artwork";
 import changeDisplayHistory from "/dataRedefine/displayHistory";
 import changeAnalects from "/dataRedefine/analects";
-import {createContents, createContents4Interface, removeContents4Interface} from "/service/interface";
+import {createContents, createContents4Interface, removeContents4Interface,stringConvert} from "/service/interface";
 
 const migrationRoute = (app) => {
     app.get('/changeAge', (request, response) => {
@@ -49,6 +49,13 @@ const migrationRoute = (app) => {
 
     app.get('/removeContents4Interface', (request, response) => {
         removeContents4Interface();
+        response.status(200).end(JSON.stringify({
+            result: 'success'
+        }));
+    });
+
+    app.get('/stringConvert', (request, response) => {
+        stringConvert();
         response.status(200).end(JSON.stringify({
             result: 'success'
         }));

@@ -20,7 +20,6 @@ const saveToFirebase = (data, domain, {
     const partitioned = partition(data, _data => _data['id']);
     const pushFunc = data => {
         ref.push((function (serverTime) {
-            console.log(`test ${data}`);
             data['createDate'] = serverTime;
             if (propertiesCallBacks) {
                 for (let prop in propertiesCallBacks) {

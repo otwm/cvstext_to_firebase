@@ -134,3 +134,42 @@ export const createContents = () => {
 export const createContents4Interface = () => {
     createLogic(true);
 };
+
+export const stringConvert = () => {
+    const isTarget = (data) => {
+        for (let [key, value] of Object.entries(data)) {
+            if (typeof value === "number" && key !== "createDate")return true;
+        }
+        return false;
+    };
+
+    const convert = (data) => {
+        for (let [key, value] of Object.entries(data)) {
+            if (typeof value === "number" && key !== "createDate") {
+                data[key] = value + '';
+            }
+        }
+        return data;
+    };
+
+    [
+        age
+        , analects
+        , artwork
+        , displayHistory
+        , content
+        , contents4Interface
+    ].forEach((ref) => {
+        console.log(ref);
+        ref.transaction(dataObject => {
+            if (dataObject) {
+                for (let [key, value] of Object.entries(dataObject)) {
+                    if (isTarget(value)) {
+                        dataObject[key] = convert(value);
+                    }
+                }
+            }
+            return dataObject;
+        });
+    });
+};

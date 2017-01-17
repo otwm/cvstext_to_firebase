@@ -57,6 +57,11 @@ export const loadDomainData = () => {
     return domainData;
 };
 
+/**
+ * 프로퍼티 별 실행할 특이 함수
+ * @param domain
+ * @returns {*}
+ */
 export const propertiesCallBacks = (domain) => {
     switch (domain) {
         case "Images":
