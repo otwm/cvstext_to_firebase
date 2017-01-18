@@ -31,7 +31,7 @@ const dataType = (domain) => {
     if (domain === "people") return "basic";
     if (domain === "images") return "basic";
     if (domain === "city") return "basic";
-    if (domain === "movie") return "basic";
+    if (domain === "movies") return "basic";
 
     if (domain === "contents4Interface") return "interface";
     throw '정의되지 않은 타입';
@@ -39,10 +39,22 @@ const dataType = (domain) => {
 
 const notice = ({domain, key, value}) => {
     const toContents4Interfaces = () => {
-
         if (dataType(domain) === "domain") {
-            contents4InterfaceRef.equalTo(key, "key").once((snapshot) => {
-                var a = Object.assign({}, snapshot.val(), {data: value});
+            contents4InterfaceRef.orderByChild("key").equalTo(key).once("value", (snapshot) => {
+                const data = Object.values(snapshot.val())[0];
+                const key = Object.keys(snapshot.val())[0];
+                const newData = ((value) => {
+                    let temp = Object.assign({}, data.data);
+                    for (let key in temp) {
+                        if (!["people", "locations", "city", "images", "movies"].includes(key)) {
+                            temp[key] = value[key];
+                        }
+                    }
+                    return temp;
+                })(value);
+                const newValue = Object.assign({}, snapshot.val(), newData);
+                wsConnections.forEach(connection => connection.send(JSON.stringify(newValue)));
+                firebaseDatabase.ref(`/contents4Interface/${key}/data`).update(newData);
             });
         } else if (dataType(domain) === "basic") {
 
@@ -51,9 +63,9 @@ const notice = ({domain, key, value}) => {
         }
     };
     const contents4Interfaces = toContents4Interfaces({domain, key, value});
-    toContents4Interfaces({domain, key, value}).forEach(contents4Interface => {
-        wsConnections.forEach(connection => connection.send(contents4Interface));
-    });
+    // toContents4Interfaces({domain, key, value}).forEach(contents4Interface => {
+    //     wsConnections.forEach(connection => connection.send(contents4Interface));
+    // });
     return contents4Interfaces;
 };
 
