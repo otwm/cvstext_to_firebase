@@ -1,13 +1,19 @@
 import {firebaseDatabase} from "fb/firebase";
 import Immutable from "immutable";
 import {loadDomainData} from "/domain";
+import {wsConnections} from "/server";
 
 const age = firebaseDatabase.ref('/age');
 const analects = firebaseDatabase.ref('/analects');
 const artwork = firebaseDatabase.ref('/artwork');
 const displayHistory = firebaseDatabase.ref('/displayHistory');
 const content = firebaseDatabase.ref('/content');
-const contents4Interface = firebaseDatabase.ref('/contents4Interface');
+const contents4InterfaceRef = firebaseDatabase.ref('/contents4Interface');
+
+const people = firebaseDatabase.ref('/people');
+const images = firebaseDatabase.ref('/images');
+const city = firebaseDatabase.ref('/city');
+const movie = firebaseDatabase.ref('/movie');
 
 const domainData = loadDomainData();
 
@@ -16,11 +22,151 @@ const findDomainByKey = (domainName, key) => {
     return domainData[domainName][key];
 };
 
+const dataType = (domain) => {
+    if (domain === "age") return "domain";
+    if (domain === "analects") return "domain";
+    if (domain === "artwork") return "domain";
+    if (domain === "displayHistory") return "domain";
+
+    if (domain === "people") return "basic";
+    if (domain === "images") return "basic";
+    if (domain === "city") return "basic";
+    if (domain === "movie") return "basic";
+
+    if (domain === "contents4Interface") return "interface";
+    throw '정의되지 않은 타입';
+};
+
+const notice = ({domain, key, value}) => {
+    const toContents4Interfaces = () => {
+
+        if (dataType(domain) === "domain") {
+            contents4InterfaceRef.equalTo(key, "key").once((snapshot) => {
+                var a = Object.assign({}, snapshot.val(), {data: value});
+            });
+        } else if (dataType(domain) === "basic") {
+
+        } else {
+
+        }
+    };
+    const contents4Interfaces = toContents4Interfaces({domain, key, value});
+    toContents4Interfaces({domain, key, value}).forEach(contents4Interface => {
+        wsConnections.forEach(connection => connection.send(contents4Interface));
+    });
+    return contents4Interfaces;
+};
+
+const updateContents4Interface = (contents4Interfaces) => {
+    console.log(contents4Interfaces);
+};
+
+const loaded = {
+    age: false,
+    analects: false,
+    artwork: false,
+    displayHistory: false,
+    people: false,
+    images: false,
+    city: false
+};
+
 /**
  * 처음 접속 시
  */
 export const startContentService = () => {
+    [
+        age
+        , analects
+        , artwork
+        , displayHistory
+    ].forEach((ref) => {
+        ref.on('child_changed', (snapshot) => {
+            const value = snapshot.val();
+            updateContents4Interface(notice({
+                domain: ref.key,
+                key: snapshot.key,
+                value
+            }));
+        });
 
+        ref.on('child_removed', (snapshot) => {
+            const value = snapshot.val();
+            updateContents4Interface(notice({
+                domain: ref.key,
+                key: snapshot.key,
+                value
+            }));
+        });
+
+        ref.on('child_moved', (snapshot) => {
+            const value = snapshot.val();
+            updateContents4Interface(notice({
+                domain: ref.key,
+                key: snapshot.key,
+                value
+            }));
+        });
+
+        ref.limitToLast(1).on('child_added', (snapshot) => {
+            if (!loaded[ref.key]) {
+                loaded[ref.key] = true;
+            } else {
+                const value = snapshot.val();
+                updateContents4Interface(notice({
+                    domain: ref.key,
+                    key: snapshot.key,
+                    value
+                }));
+            }
+        })
+    });
+
+    [
+        people
+        , images
+        , city
+    ].forEach((ref) => {
+        ref.on('child_changed', (snapshot) => {
+            const value = snapshot.val();
+            updateContents4Interface(notice({
+                domain: ref.key,
+                key: snapshot.key,
+                value
+            }));
+        });
+
+        ref.on('child_removed', (snapshot) => {
+            const value = snapshot.val();
+            updateContents4Interface(notice({
+                domain: ref.key,
+                key: snapshot.key,
+                value
+            }));
+        });
+
+        ref.on('child_moved', (snapshot) => {
+            const value = snapshot.val();
+            updateContents4Interface(notice({
+                domain: ref.key,
+                key: snapshot.key,
+                value
+            }));
+        });
+
+        ref.limitToLast(1).on('child_added', (snapshot) => {
+            if (!loaded[ref.key]) {
+                loaded[ref.key] = true;
+            } else {
+                const value = snapshot.val();
+                updateContents4Interface(notice({
+                    domain: ref.key,
+                    key: snapshot.key,
+                    value
+                }));
+            }
+        });
+    });
 };
 
 const convert = (item) => {
@@ -50,7 +196,7 @@ const convert = (item) => {
 };
 
 export const removeContents4Interface = () => {
-    contents4Interface.remove().catch(e => console.error(e));
+    contents4InterfaceRef.remove().catch(e => console.error(e));
 }
 
 const createLogic = (is4Interface) => {
@@ -117,7 +263,7 @@ const createLogic = (is4Interface) => {
             item.order = index;
             if (is4Interface) {
                 item.data = convert(item.data);
-                contents4Interface.push(item)
+                contents4InterfaceRef.push(item)
                     .catch(error => console.error(error));
             } else {
                 content.push(item).catch(error => console.error(error));
@@ -158,7 +304,7 @@ export const stringConvert = () => {
         , artwork
         , displayHistory
         , content
-        , contents4Interface
+        , contents4InterfaceRef
     ].forEach((ref) => {
         console.log(ref);
         ref.transaction(dataObject => {
