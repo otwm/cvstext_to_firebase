@@ -47,7 +47,6 @@ app.use(express.static(__dirname + '/public'));
 server.listen(4000, () => {
     console.log('Listening on %d', server.address().port);
     startContentService();
-
 });
 
 

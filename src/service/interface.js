@@ -3,10 +3,10 @@ import Immutable from "immutable";
 import {loadDomainData} from "/domain";
 import {wsConnections} from "/server";
 
-const age = firebaseDatabase.ref('/age');
-const analects = firebaseDatabase.ref('/analects');
-const artwork = firebaseDatabase.ref('/artwork');
-const displayHistory = firebaseDatabase.ref('/displayHistory');
+const ageRef = firebaseDatabase.ref('/age');
+const analectsRef = firebaseDatabase.ref('/analects');
+const artworkRef = firebaseDatabase.ref('/artwork');
+const displayHistoryRef = firebaseDatabase.ref('/displayHistory');
 const content = firebaseDatabase.ref('/content');
 const contents4InterfaceRef = firebaseDatabase.ref('/contents4Interface');
 
@@ -37,40 +37,51 @@ const dataType = (domain) => {
     throw '정의되지 않은 타입';
 };
 
-const notice = ({domain, key, value}) => {
-    const toContents4Interfaces = () => {
-        if (dataType(domain) === "domain") {
-            contents4InterfaceRef.orderByChild("key").equalTo(key).once("value", (snapshot) => {
-                const data = Object.values(snapshot.val())[0];
-                const key = Object.keys(snapshot.val())[0];
-                const newData = ((value) => {
-                    let temp = Object.assign({}, data.data);
-                    for (let key in temp) {
-                        if (!["people", "locations", "city", "images", "movies"].includes(key)) {
-                            temp[key] = value[key];
-                        }
-                    }
-                    return temp;
-                })(value);
-                const newValue = Object.assign({}, snapshot.val(), newData);
-                wsConnections.forEach(connection => connection.send(JSON.stringify(newValue)));
-                firebaseDatabase.ref(`/contents4Interface/${key}/data`).update(newData);
-            });
-        } else if (dataType(domain) === "basic") {
-
-        } else {
-
+const noticeAndUpdate = ({domain, key, value}) => {
+    const _assignForDomain = (oldValue, newValue) => {
+        for (let key in oldValue) {
+            if (!["people", "locations", "city", "images", "movies"].includes(key)) {
+                oldValue[key] = newValue[key];
+            }
         }
+        return oldValue;
     };
-    const contents4Interfaces = toContents4Interfaces({domain, key, value});
-    // toContents4Interfaces({domain, key, value}).forEach(contents4Interface => {
-    //     wsConnections.forEach(connection => connection.send(contents4Interface));
-    // });
-    return contents4Interfaces;
-};
 
-const updateContents4Interface = (contents4Interfaces) => {
-    console.log(contents4Interfaces);
+    const _assignForBasic = (oldValue, newValue, domain) => {
+        oldValue[domain] = value;
+        return oldValue;
+    };
+
+    const _noticeAndUpdate = (snapshot, assign) => {
+        const data = Object.values(snapshot.val())[0];
+        const key = Object.keys(snapshot.val())[0];
+        const newData = assign(Object.assign({}, data.data), value, domain);
+
+        const newValue = Object.assign({}, snapshot.val(), newData);
+        wsConnections.forEach(connection => connection.send(JSON.stringify(newValue)));
+        firebaseDatabase.ref(`/contents4Interface/${key}/data`).update(newData);
+    };
+
+    if (dataType(domain) === "domain") {
+        contents4InterfaceRef.orderByChild("key").equalTo(key).once("value", (snapshot) => {
+            _noticeAndUpdate(snapshot, _assignForDomain);
+        });
+    } else if (dataType(domain) === "basic") {
+        [
+            ageRef,
+            analectsRef,
+            artworkRef,
+            displayHistoryRef
+        ].forEach(ref => {
+            ref.orderByChild(domain).equalTo(key).once("value", (snapshot) => {
+                if (!snapshot.val())return;
+                const key = Object.keys(snapshot.val())[0];
+                contents4InterfaceRef.orderByChild("key").equalTo(key).once("value", (snapshot) => {
+                    _noticeAndUpdate(snapshot, _assignForBasic);
+                });
+            });
+        });
+    }
 };
 
 const loaded = {
@@ -88,36 +99,36 @@ const loaded = {
  */
 export const startContentService = () => {
     [
-        age
-        , analects
-        , artwork
-        , displayHistory
+        ageRef
+        , analectsRef
+        , artworkRef
+        , displayHistoryRef
     ].forEach((ref) => {
         ref.on('child_changed', (snapshot) => {
             const value = snapshot.val();
-            updateContents4Interface(notice({
+            noticeAndUpdate({
                 domain: ref.key,
                 key: snapshot.key,
                 value
-            }));
+            });
         });
 
         ref.on('child_removed', (snapshot) => {
             const value = snapshot.val();
-            updateContents4Interface(notice({
+            noticeAndUpdate({
                 domain: ref.key,
                 key: snapshot.key,
                 value
-            }));
+            });
         });
 
         ref.on('child_moved', (snapshot) => {
             const value = snapshot.val();
-            updateContents4Interface(notice({
+            noticeAndUpdate({
                 domain: ref.key,
                 key: snapshot.key,
                 value
-            }));
+            });
         });
 
         ref.limitToLast(1).on('child_added', (snapshot) => {
@@ -125,11 +136,11 @@ export const startContentService = () => {
                 loaded[ref.key] = true;
             } else {
                 const value = snapshot.val();
-                updateContents4Interface(notice({
+                noticeAndUpdate({
                     domain: ref.key,
                     key: snapshot.key,
                     value
-                }));
+                });
             }
         })
     });
@@ -141,29 +152,29 @@ export const startContentService = () => {
     ].forEach((ref) => {
         ref.on('child_changed', (snapshot) => {
             const value = snapshot.val();
-            updateContents4Interface(notice({
+            noticeAndUpdate({
                 domain: ref.key,
                 key: snapshot.key,
                 value
-            }));
+            });
         });
 
         ref.on('child_removed', (snapshot) => {
             const value = snapshot.val();
-            updateContents4Interface(notice({
+            noticeAndUpdate({
                 domain: ref.key,
                 key: snapshot.key,
                 value
-            }));
+            });
         });
 
         ref.on('child_moved', (snapshot) => {
             const value = snapshot.val();
-            updateContents4Interface(notice({
+            noticeAndUpdate({
                 domain: ref.key,
                 key: snapshot.key,
                 value
-            }));
+            });
         });
 
         ref.limitToLast(1).on('child_added', (snapshot) => {
@@ -171,11 +182,11 @@ export const startContentService = () => {
                 loaded[ref.key] = true;
             } else {
                 const value = snapshot.val();
-                updateContents4Interface(notice({
+                noticeAndUpdate({
                     domain: ref.key,
                     key: snapshot.key,
                     value
-                }));
+                });
             }
         });
     });
@@ -214,10 +225,10 @@ export const removeContents4Interface = () => {
 const createLogic = (is4Interface) => {
 
     Promise.all([
-        age.once('value').then((snapshot) => snapshot.val()),
-        analects.once('value').then((snapshot) => snapshot.val()),
-        artwork.once('value').then((snapshot) => snapshot.val()),
-        displayHistory.once('value').then((snapshot) => snapshot.val())
+        ageRef.once('value').then((snapshot) => snapshot.val()),
+        analectsRef.once('value').then((snapshot) => snapshot.val()),
+        artworkRef.once('value').then((snapshot) => snapshot.val()),
+        displayHistoryRef.once('value').then((snapshot) => snapshot.val())
     ]).then(results => {
         /**
          * 프라미스 인자에 따른 타입 정의
@@ -311,10 +322,10 @@ export const stringConvert = () => {
     };
 
     [
-        age
-        , analects
-        , artwork
-        , displayHistory
+        ageRef
+        , analectsRef
+        , artworkRef
+        , displayHistoryRef
         , content
         , contents4InterfaceRef
     ].forEach((ref) => {
